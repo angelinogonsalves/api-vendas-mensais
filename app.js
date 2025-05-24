@@ -6,8 +6,6 @@ import vendasRoutes from './routes/vendasRoutes.js';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
-
 app.use(express.json());
 
 // Conexão com banco
@@ -22,7 +20,6 @@ const connectDB = async () => {
 
 connectDB();
 
-// 🔗 Usa as rotas separadas
 app.use('/vendas', vendasRoutes);
 
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+export default app;
