@@ -1,25 +1,27 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+
+// Configurações
+import { connectDB } from './config/db.js';
+
+// Middlewares
+import verificarToken from './middleware/authMiddleware.js';
+
+// Rotas
+import authRoutes from './routes/authRoutes.js';
 import vendasRoutes from './routes/vendasRoutes.js';
+import usersRoutes from './routes/usersRoutes.js';
+
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-// Conexão com banco
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('MongoDB conectado com sucesso!');
-  } catch (error) {
-    console.error('Erro ao conectar ao MongoDB:', error);
-  }
-};
-
 connectDB();
 
-app.use('/vendas', vendasRoutes);
+app.use('/auth', authRoutes);
+app.use('/vendas', verificarToken, vendasRoutes);
+app.use('/users', usersRoutes);
 
 export default app;

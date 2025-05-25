@@ -1,13 +1,36 @@
-// vendas/test.js
 import request from 'supertest';
 import app from '../app.js';
 import mongoose from 'mongoose';
 
+let token = '';
+
+beforeAll(async () => {
+  await mongoose.connect(process.env.MONGO_URI);
+
+  const email = `testuser${Date.now()}@example.com`;
+
+  await request(app).post('/auth/register').send({
+    nome: 'Test User',
+    email,
+    senha: '123456'
+  });
+
+  const res = await request(app).post('/auth/login').send({
+    email,
+    senha: '123456'
+  });
+
+  token = res.body.token;
+});
+
 describe('Testes da API de Vendas', () => {
 
   it('Deve retornar todas as vendas', async () => {
-    const res = await request(app).get('/vendas');
-    expect(res.statusCode).toEqual(200);
+    const res = await request(app)
+      .get('/vendas')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
     expect(Array.isArray(res.body)).toBeTruthy();
   });
 
@@ -20,10 +43,10 @@ describe('Testes da API de Vendas', () => {
 
     const res = await request(app)
       .post('/vendas')
+      .set('Authorization', `Bearer ${token}`)
       .send(novaVenda)
       .expect(200);
 
-    // Verifica se os dados voltam corretamente
     expect(res.body).toHaveProperty('_id');
     expect(res.body.ano).toBe(2024);
     expect(res.body.mes).toBe('05');
@@ -39,6 +62,7 @@ describe('Testes da API de Vendas', () => {
 
     const vendaCriada = await request(app)
       .post('/vendas')
+      .set('Authorization', `Bearer ${token}`)
       .send(novaVenda);
 
     const vendaAtualizada = {
@@ -49,6 +73,7 @@ describe('Testes da API de Vendas', () => {
 
     const res = await request(app)
       .put(`/vendas/${vendaCriada.body._id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(vendaAtualizada)
       .expect(200);
 
@@ -64,10 +89,12 @@ describe('Testes da API de Vendas', () => {
 
     const vendaCriada = await request(app)
       .post('/vendas')
+      .set('Authorization', `Bearer ${token}`)
       .send(novaVenda);
 
     const res = await request(app)
       .delete(`/vendas/${vendaCriada.body._id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
     expect(res.body.message).toBe('Venda excluída com sucesso!');
