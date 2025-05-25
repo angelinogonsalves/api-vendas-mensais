@@ -1,6 +1,6 @@
 # 📊 API de Vendas Mensais
 
-API RESTful desenvolvida com **Node.js**, **Express** e **MongoDB (Mongoose)**, estruturada no padrão **MVC** e com **testes automatizados** usando **Jest** e **Supertest**.
+API RESTful desenvolvida com **Node.js**, **Express** e **MongoDB (Mongoose)**, estruturada no padrão **MVC**, com **JWT para autenticação**, e **testes automatizados** usando **Jest** e **Supertest**.
 
 ---
 
@@ -13,6 +13,8 @@ API RESTful desenvolvida com **Node.js**, **Express** e **MongoDB (Mongoose)**, 
 - [Jest](https://jestjs.io)
 - [Supertest](https://github.com/visionmedia/supertest)
 - [Dotenv](https://github.com/motdotla/dotenv)
+- [bcryptjs](https://www.npmjs.com/package/bcryptjs)
+- [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
 
 ---
 
@@ -20,10 +22,13 @@ API RESTful desenvolvida com **Node.js**, **Express** e **MongoDB (Mongoose)**, 
 
 ```
 /
+├── config/             # Configurações (ex: banco de dados)
 ├── controllers/        # Lógica das rotas
+├── middleware/         # Middlewares (ex: autenticação JWT)
 ├── models/             # Modelos do Mongoose
-├── routes/             # Rotas separadas
-├── vendas/test.js      # Testes automatizados
+├── routes/             # Arquivos de rotas por domínio
+├── scripts/            # Scripts auxiliares (ex: seed de usuários)
+├── tests/              # Testes automatizados
 ├── app.js              # Configuração principal do app
 ├── server.js           # Inicialização do servidor
 ├── .env                # Variáveis de ambiente (não commitado)
@@ -33,6 +38,20 @@ API RESTful desenvolvida com **Node.js**, **Express** e **MongoDB (Mongoose)**, 
 
 ## 🔄 Rotas principais
 
+### 🛡️ Autenticação
+| Método | Rota         | Descrição                      |
+|--------|--------------|---------------------------------|
+| POST   | `/auth/register` | Registra um novo usuário       |
+| POST   | `/auth/login`    | Realiza login e retorna token |
+
+### 👤 Usuários
+| Método | Rota           | Descrição                     |
+|--------|----------------|-------------------------------|
+| GET    | `/users`       | Lista todos os usuários       |
+| PUT    | `/users/:id`   | Atualiza um usuário           |
+| DELETE | `/users/:id`   | Remove um usuário             |
+
+### 📊 Vendas (protegidas com JWT)
 | Método | Rota            | Descrição                 |
 |--------|------------------|---------------------------|
 | GET    | `/vendas`        | Lista todas as vendas     |
@@ -44,7 +63,7 @@ API RESTful desenvolvida com **Node.js**, **Express** e **MongoDB (Mongoose)**, 
 
 ## 🧪 Testes Automatizados
 
-O projeto possui testes automatizados para as principais rotas da API utilizando `Jest` e `Supertest`.
+O projeto possui testes automatizados para autenticação, usuários e vendas, utilizando `Jest` e `Supertest`.
 
 ### 📌 Rodando os testes:
 
@@ -53,7 +72,7 @@ npm install
 npm test
 ```
 
-> Os testes utilizam a conexão com o MongoDB. Por padrão, salvam dados reais, então use um banco separado para testes ou adapte para uso com MongoDB in-memory.
+> Os testes utilizam autenticação JWT e conexão com MongoDB real. Recomenda-se usar um banco separado para testes ou MongoDB in-memory.
 
 ---
 
@@ -67,7 +86,8 @@ npm test
 
 2. Crie um arquivo `.env` na raiz com:
    ```
-   MONGO_URI=mongodb://localhost:27017/nome-do-seu-banco
+   MONGO_URI=mongodb://localhost:27017/api-vendas
+   JWT_SECRET=sua_chave_jwt
    ```
 
 3. Instale as dependências:
@@ -90,10 +110,3 @@ npm test
 
 Desenvolvido por [Angelino Gonsalves](https://github.com/angelinogonsalves)  
 Contato: angelino.gonsalves@gmail.com
-
----
-
-## ✅ Contribuições
-
-Sinta-se à vontade para abrir issues ou pull requests.  
-Vamos melhorar juntos! 💪
